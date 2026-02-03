@@ -1,5 +1,5 @@
 import { Component, type ReactNode } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
+import { HashRouter, Routes, Route, Navigate } from 'react-router';
 import { useAppStore } from '@/stores/appStore';
 import { useActiveUser } from '@/hooks/useUser';
 import AppShell from '@/components/layout/AppShell';
@@ -80,9 +80,9 @@ function AppRoutes() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter basename="/neighborhood-explorer">
+      <HashRouter>
         <AppRoutes />
-      </BrowserRouter>
+      </HashRouter>
     </ErrorBoundary>
   );
 }
