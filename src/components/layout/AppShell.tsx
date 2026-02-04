@@ -117,6 +117,9 @@ export default function AppShell() {
 
           <div className="mt-3 border-t border-gray-200 pt-3">
             <span className="mb-2 block text-sm font-semibold text-gray-700">Data</span>
+            <p className="mb-2 text-xs text-gray-500">
+              Export your data before removing the app. You can import the CSV later to restore your progress.
+            </p>
             <div className="flex gap-2">
               <button
                 onClick={handleExport}

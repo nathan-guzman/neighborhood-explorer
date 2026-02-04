@@ -2,6 +2,10 @@ import { db } from '@/db';
 import type { VisitStatus } from '@/types';
 
 interface ExportRow {
+  profile: string;
+  homeLat: string;
+  homeLng: string;
+  radiusMeters: string;
   osmId: string;
   name: string;
   category: string;
@@ -13,6 +17,7 @@ interface ExportRow {
 }
 
 const CSV_HEADERS: (keyof ExportRow)[] = [
+  'profile', 'homeLat', 'homeLng', 'radiusMeters',
   'osmId', 'name', 'category', 'subcategory', 'lat', 'lng', 'address', 'status',
 ];
 
@@ -55,11 +60,21 @@ function parseCsvLine(line: string): string[] {
 }
 
 export async function exportBusinessesCsv(userId: number): Promise<void> {
+  const user = await db.users.get(userId);
   const businesses = await db.businesses.toArray();
   const visits = await db.visits.where('userId').equals(userId).toArray();
   const visitMap = new Map(visits.map((v) => [v.businessId, v.status]));
 
+  const profileName = user?.username ?? '';
+  const homeLat = user?.homeLat != null ? String(user.homeLat) : '';
+  const homeLng = user?.homeLng != null ? String(user.homeLng) : '';
+  const radiusMeters = user?.radiusMeters != null ? String(user.radiusMeters) : '';
+
   const rows = businesses.map((b): ExportRow => ({
+    profile: profileName,
+    homeLat,
+    homeLng,
+    radiusMeters,
     osmId: b.osmId,
     name: b.name ?? '',
     category: b.category,
