@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Outlet } from 'react-router';
 import BottomNav from './BottomNav';
 import { useActiveUser, updateUserLocation } from '@/hooks/useUser';
 import { useAppStore } from '@/stores/appStore';
 import { loadBusinesses } from '@/hooks/useBusinesses';
+import { exportBusinessesCsv, importBusinessesCsv } from '@/utils/csv';
 import RadiusSlider from '@/components/onboarding/RadiusSlider';
-import { Info, LogOut, Settings, X } from 'lucide-react';
+import { Download, Info, LogOut, Settings, Upload, X } from 'lucide-react';
 
 export default function AppShell() {
   const user = useActiveUser();
@@ -14,8 +15,33 @@ export default function AppShell() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [radius, setRadius] = useState<number | null>(null);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentRadius = radius ?? user?.radiusMeters ?? 805;
+
+  const handleExport = async () => {
+    if (!user?.id) return;
+    try {
+      await exportBusinessesCsv(user.id);
+    } catch (err) {
+      console.error('Export error:', err);
+    }
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+    setImportMsg(null);
+    try {
+      const result = await importBusinessesCsv(file, user.id);
+      setImportMsg(`Imported ${result.updated} statuses${result.skipped > 0 ? `, ${result.skipped} skipped` : ''}.`);
+    } catch (err) {
+      setImportMsg(err instanceof Error ? err.message : 'Import failed.');
+    }
+    // Reset file input so the same file can be re-selected
+    e.target.value = '';
+  };
 
   const handleSaveRadius = async () => {
     if (!user?.id || user.homeLat == null || user.homeLng == null) return;
@@ -86,6 +112,36 @@ export default function AppShell() {
                 <p>Use the dashboard to see your progress at a glance. The list view lets you filter and search, and the map view shows your visits color-coded on a real map.</p>
                 <p>All your data stays on your device — no accounts, no servers, no tracking.</p>
               </div>
+            )}
+          </div>
+
+          <div className="mt-3 border-t border-gray-200 pt-3">
+            <span className="mb-2 block text-sm font-semibold text-gray-700">Data</span>
+            <div className="flex gap-2">
+              <button
+                onClick={handleExport}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <Download size={16} />
+                Export CSV
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <Upload size={16} />
+                Import CSV
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleImport}
+                className="hidden"
+              />
+            </div>
+            {importMsg && (
+              <p className="mt-2 text-xs text-gray-500">{importMsg}</p>
             )}
           </div>
         </div>
