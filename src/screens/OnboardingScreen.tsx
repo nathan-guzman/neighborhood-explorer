@@ -51,9 +51,19 @@ export default function OnboardingScreen() {
     <div className="flex h-full flex-col bg-gray-50">
       <div className="flex-1 overflow-auto px-6 py-8">
         <h1 className="mb-2 text-2xl font-bold text-gray-900">
-          Set Your Home Base
+          Welcome to Locale
         </h1>
-        <p className="mb-6 text-gray-500">
+        <p className="mb-2 text-sm text-gray-500">
+          Locale helps you discover and track the businesses in your neighborhood. Set your home address and a radius, and Locale pulls in every business around you — restaurants, shops, services, and more.
+        </p>
+        <p className="mb-6 text-sm text-gray-500">
+          Swipe through businesses to mark them as visited or not, track your progress on the dashboard, and see everything color-coded on the map. All your data stays on your device.
+        </p>
+
+        <h2 className="mb-2 text-lg font-semibold text-gray-900">
+          Set Your Home Base
+        </h2>
+        <p className="mb-4 text-gray-500">
           Choose a location to explore the businesses around it.
         </p>
 

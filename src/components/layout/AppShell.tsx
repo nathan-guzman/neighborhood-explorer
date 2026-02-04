@@ -5,13 +5,14 @@ import { useActiveUser, updateUserLocation } from '@/hooks/useUser';
 import { useAppStore } from '@/stores/appStore';
 import { loadBusinesses } from '@/hooks/useBusinesses';
 import RadiusSlider from '@/components/onboarding/RadiusSlider';
-import { LogOut, Settings, X } from 'lucide-react';
+import { Info, LogOut, Settings, X } from 'lucide-react';
 
 export default function AppShell() {
   const user = useActiveUser();
   const setActiveUserId = useAppStore((s) => s.setActiveUserId);
   const isFetching = useAppStore((s) => s.isFetchingBusinesses);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [radius, setRadius] = useState<number | null>(null);
 
   const currentRadius = radius ?? user?.radiusMeters ?? 805;
@@ -27,7 +28,7 @@ export default function AppShell() {
   return (
     <div className="flex h-full flex-col bg-gray-50 pt-[env(safe-area-inset-top)]">
       <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-        <h1 className="text-lg font-bold text-gray-900">Neighborhood Explorer</h1>
+        <h1 className="text-lg font-bold text-gray-900">Locale</h1>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">{user?.username}</span>
           <button
@@ -69,6 +70,24 @@ export default function AppShell() {
           >
             {isFetching ? 'Updating...' : 'Update & Re-fetch Businesses'}
           </button>
+
+          <div className="mt-3 border-t border-gray-200 pt-3">
+            <button
+              onClick={() => setShowAbout((v) => !v)}
+              className="flex w-full items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
+            >
+              <Info size={16} />
+              About Locale
+            </button>
+            {showAbout && (
+              <div className="mt-2 space-y-2 text-xs text-gray-500">
+                <p>Locale helps you discover and track the businesses in your neighborhood.</p>
+                <p>Set your home address and a radius, and Locale pulls in every business around you — restaurants, shops, services, and more — using OpenStreetMap data. Swipe through each business to mark it as visited or not visited, building a personal map of the places you know.</p>
+                <p>Use the dashboard to see your progress at a glance. The list view lets you filter and search, and the map view shows your visits color-coded on a real map.</p>
+                <p>All your data stays on your device — no accounts, no servers, no tracking.</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

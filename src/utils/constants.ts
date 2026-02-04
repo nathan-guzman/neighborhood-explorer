@@ -1,6 +1,6 @@
 export const OVERPASS_API_URL = 'https://overpass-api.de/api/interpreter';
 export const NOMINATIM_URL = 'https://nominatim.openstreetmap.org';
-export const APP_USER_AGENT = 'NeighborhoodExplorer/1.0';
+export const APP_USER_AGENT = 'Locale/1.0';
 
 export const DEFAULT_RADIUS_METERS = 805; // 0.5 miles
 export const MIN_RADIUS_MILES = 0.25;
