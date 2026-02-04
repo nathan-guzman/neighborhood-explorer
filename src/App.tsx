@@ -9,6 +9,7 @@ import SwipeScreen from '@/screens/SwipeScreen';
 import DashboardScreen from '@/screens/DashboardScreen';
 import ListScreen from '@/screens/ListScreen';
 import MapScreen from '@/screens/MapScreen';
+import InstallPrompt from '@/components/InstallPrompt';
 
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -82,6 +83,7 @@ export default function App() {
     <ErrorBoundary>
       <HashRouter>
         <AppRoutes />
+        <InstallPrompt />
       </HashRouter>
     </ErrorBoundary>
   );
