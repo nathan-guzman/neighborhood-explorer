@@ -15,6 +15,7 @@ export default function OnboardingScreen() {
   const [lng, setLng] = useState<number | null>(null);
   const [radiusMeters, setRadiusMeters] = useState(DEFAULT_RADIUS_METERS);
   const [saving, setSaving] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const geo = useGeolocation();
 
   const handleAddressSelect = (newLat: number, newLng: number) => {
@@ -35,6 +36,7 @@ export default function OnboardingScreen() {
   const handleSave = async () => {
     if (!activeUserId || lat === null || lng === null) return;
     setSaving(true);
+    setFetchError(null);
     try {
       // Fetch businesses first, before updating location.
       // Updating location triggers a redirect to the main app,
@@ -43,6 +45,7 @@ export default function OnboardingScreen() {
       await updateUserLocation(activeUserId, lat, lng, radiusMeters);
     } catch (err) {
       console.error('Setup error:', err);
+      setFetchError('Could not load businesses. The data source may be temporarily unavailable — please try again.');
       setSaving(false);
     }
   };
@@ -106,12 +109,15 @@ export default function OnboardingScreen() {
 
       {lat !== null && lng !== null && (
         <div className="border-t border-gray-200 bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {fetchError && (
+            <p className="mb-3 text-center text-sm text-red-500">{fetchError}</p>
+          )}
           <button
             onClick={handleSave}
             disabled={saving}
             className="w-full rounded-lg bg-blue-600 py-3.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
           >
-            {saving ? 'Finding businesses...' : 'Start Exploring'}
+            {saving ? 'Finding businesses...' : fetchError ? 'Try Again' : 'Start Exploring'}
           </button>
         </div>
       )}

@@ -25,6 +25,34 @@ function parseAddress(tags: Record<string, string>): string | null {
   return parts.join(' ');
 }
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries: number = 2,
+  delayMs: number = 1500
+): Promise<Response> {
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return response;
+      // Retry on 429 (rate limit) or 5xx (server errors)
+      if (attempt < maxRetries && (response.status === 429 || response.status >= 500)) {
+        await new Promise((r) => setTimeout(r, delayMs * (attempt + 1)));
+        continue;
+      }
+      throw new Error(`Overpass API error: ${response.status} ${response.statusText}`);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      if (attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, delayMs * (attempt + 1)));
+        continue;
+      }
+    }
+  }
+  throw lastError ?? new Error('Failed to fetch from Overpass API');
+}
+
 export async function fetchBusinesses(
   lat: number,
   lng: number,
@@ -32,17 +60,13 @@ export async function fetchBusinesses(
 ): Promise<Omit<Business, 'id'>[]> {
   const query = buildBusinessQuery(lat, lng, radiusMeters);
 
-  const response = await fetch(OVERPASS_API_URL, {
+  const response = await fetchWithRetry(OVERPASS_API_URL, {
     method: 'POST',
     body: `data=${encodeURIComponent(query)}`,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
-
-  if (!response.ok) {
-    throw new Error(`Overpass API error: ${response.status} ${response.statusText}`);
-  }
 
   const data: OverpassResponse = await response.json();
   const now = new Date();
