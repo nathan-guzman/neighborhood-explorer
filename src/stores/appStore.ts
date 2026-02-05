@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import { ACTIVE_USER_STORAGE_KEY } from '@/utils/constants';
 
-interface ListFilter {
-  category: string | null;
-  status: 'all' | 'visited' | 'not_visited' | 'unreviewed' | 'flagged';
+export type FilterStatus = 'visited' | 'not_visited' | 'unreviewed' | 'flagged';
+
+export interface ListFilter {
+  categories: string[];
+  statuses: FilterStatus[];
   searchQuery: string;
 }
 
@@ -42,8 +44,8 @@ export const useAppStore = create<AppState>((set) => ({
   setError: (e) => set({ error: e }),
 
   listFilter: {
-    category: null,
-    status: 'all',
+    categories: [],
+    statuses: [],
     searchQuery: '',
   },
   setListFilter: (filter) =>

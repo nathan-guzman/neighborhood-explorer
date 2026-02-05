@@ -5,9 +5,8 @@ import { useVisitMap, recordVisit } from '@/hooks/useVisits';
 import { useAppStore } from '@/stores/appStore';
 import FilterBar from '@/components/list/FilterBar';
 import BusinessListItem from '@/components/list/BusinessListItem';
-import { FLAGGED_STATUSES } from '@/types';
+import { filterBusinesses } from '@/utils/filterBusinesses';
 import type { VisitStatus } from '@/types';
-import { getDisplayName } from '@/utils/categories';
 
 export default function ListScreen() {
   const user = useActiveUser();
@@ -23,34 +22,7 @@ export default function ListScreen() {
 
   const filtered = useMemo(() => {
     if (!businesses || !visitMap) return [];
-
-    return businesses.filter((b) => {
-      const status = b.id !== undefined ? visitMap.get(b.id) : undefined;
-
-      // Status filter
-      if (listFilter.status === 'visited' && status !== 'visited') return false;
-      if (listFilter.status === 'not_visited' && status !== 'not_visited') return false;
-      if (listFilter.status === 'unreviewed' && status !== undefined) return false;
-      if (listFilter.status === 'flagged' && (!status || !FLAGGED_STATUSES.includes(status))) return false;
-
-      // Category filter
-      if (listFilter.category && b.category !== listFilter.category) return false;
-
-      // Search
-      if (listFilter.searchQuery) {
-        const q = listFilter.searchQuery.toLowerCase();
-        const displayName = getDisplayName(b.name, b.subcategory).toLowerCase();
-        if (
-          !displayName.includes(q) &&
-          !b.subcategory.toLowerCase().includes(q) &&
-          !(b.address || '').toLowerCase().includes(q)
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
+    return filterBusinesses(businesses, visitMap, listFilter);
   }, [businesses, visitMap, listFilter]);
 
   if (!user || !businesses || !visitMap) {
