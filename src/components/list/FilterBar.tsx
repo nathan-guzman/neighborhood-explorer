@@ -87,7 +87,7 @@ export default function FilterBar({ categories }: Props) {
         </button>
 
         {showCategories && (
-          <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+          <div className="absolute left-0 right-0 top-full z-[1001] mt-1 max-h-48 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
             {listFilter.categories.length > 0 && (
               <button
                 onClick={clearCategories}
